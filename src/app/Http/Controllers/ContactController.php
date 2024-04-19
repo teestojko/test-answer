@@ -11,25 +11,35 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContactController extends Controller
 {
+    // index関数を呼び出すことで、Categoryモデルから全てのカテゴリーを取得し、categories変数に格納している
+    // その後、contact.blade.phpにcategories変数を渡している
     public function index()
     {
         $categories = Category::all();
         return view('contact', compact('categories'));
     }
 
-    public function confirm(ContactRequest $request)
+
+    public function confirm
+    // バリデーションをリクエストしてる
+    (ContactRequest $request)
     {
+        // リクエストした全てのバリデーションを$contactsに格納してる
         $contacts = $request->all();
+        // 外部キーであるcategory_idを$requestから取り出し、それを使用して対応するカテゴリーをデータベースから検索してる
         $category = Category::find($request->category_id);
+        // compact関数は、複数の変数を渡す
         return view('confirm', compact('contacts', 'category'));
     }
 
     public function store(ContactRequest $request)
     {
+        // もしリクエストにback(修正)が含まれていたら、index画面にリダイレクトする　withInput()を入れると入力が消えずに残る
         if ($request->has('back')) {
             return redirect('/')->withInput();
         }
 
+        // tel1 tel2 tel3を結合してtellに代入してる
         $request['tell'] = $request->tel_1 . $request->tel_2 . $request->tel_3;
         Contact::create(
             $request->only([
@@ -50,8 +60,12 @@ class ContactController extends Controller
 
     public function admin()
     {
+        // withメソッドを使用して、$contactsに関連づけられたcategory情報を同時に取得
+        // それを１ページに７つの情報を表示する
         $contacts = Contact::with('category')->paginate(7);
+        // categoryモデルから全ての情報を取得して、$categoriesに格納してる
         $categories = Category::all();
+        
         $csvData = Contact::all();
         return view('admin', compact('contacts', 'categories', 'csvData'));
     }

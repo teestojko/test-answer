@@ -38,7 +38,9 @@
           @endforeach
         </select>
       </div>
+      {{-- カレンダー表示 日付画面 --}}
       <input class="search-form__date" type="date" name="date" value="{{request('date')}}">
+
       <div class="search-form__actions">
         <input class="search-form__search-btn btn" type="submit" value="検索">
         <input class="search-form__reset-btn btn" type="submit" value="リセット" name="reset">
@@ -50,9 +52,11 @@
         @csrf
         <input class="export__btn btn" type="submit" value="エクスポート">
       </form>
+      {{-- ページネーション表示 --}}
       {{ $contacts->links('vendor.pagination.custom') }}
     </div>
 
+    {{-- 横並びの項目 --}}
     <table class="admin__table">
       <tr class="admin__row">
         <th class="admin__label">お名前</th>
@@ -61,9 +65,15 @@
         <th class="admin__label">お問い合わせの種類</th>
         <th class="admin__label"></th>
       </tr>
+
+      {{-- コンタクト関数から一つずつ変数を取り出す --}}
       @foreach($contacts as $contact)
       <tr class="admin__row">
+
+        {{-- 姓名を取り出して表示 --}}
         <td class="admin__data">{{$contact->first_name}}{{$contact->last_name}}</td>
+
+        {{-- 性別を取り出して表示 valueで定義した数字も忘れずに その他は0だからいらないのかな？--}}
         <td class="admin__data">
           @if($contact->gender == 1)
           男性
@@ -73,19 +83,23 @@
           その他
           @endif
         </td>
+        {{-- email 問い合わせの種類を取り出して表示 --}}
         <td class="admin__data">{{$contact->email}}</td>
         <td class="admin__data">{{$contact->category->content}}</td>
+        {{-- 詳細ボタン作成 idを記述することで、そのユーザーの詳細を取り出せる --}}
         <td class="admin__data">
           <a class="admin__detail-btn" href="#{{$contact->id}}">詳細</a>
         </td>
       </tr>
 
+      {{-- モーダルウインドウの識別子としてidを使うことで、各ユーザーごとに異なるモーダルウインドウを表示できる --}}
       <div class="modal" id="{{$contact->id}}">
         <a href="#!" class="modal-overlay"></a>
         <div class="modal__inner">
           <div class="modal__content">
             <form class="modal__detail-form" action="/delete" method="post">
               @csrf
+              {{-- ここからモーダルの出力内容を定義 --}}
               <div class="modal-form__group">
                 <label class="modal-form__label" for="">お名前</label>
                 <p>{{$contact->first_name}}{{$contact->last_name}}</p>
@@ -128,12 +142,13 @@
                 <label class="modal-form__label" for="">お問い合わせ内容</label>
                 <p>{{$contact->detail}}</p>
               </div>
+              {{-- delete-btnとすることで、削除ボタンになる --}}
               <input type="hidden" name="id" value="{{ $contact->id }}">
               <input class="modal-form__delete-btn btn" type="submit" value="削除">
 
             </form>
           </div>
-
+          {{-- 右上のモーダルを閉じるボタンを作ってる --}}
           <a href="#" class="modal__close-btn">×</a>
         </div>
       </div>
