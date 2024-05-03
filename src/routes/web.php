@@ -15,10 +15,6 @@ Route::post('/thanks', [ContactController::class, 'store']);
 
 // 認証('auth')ミドルウェアを適用したルートグループ 認証されたユーザーのみがアクセスできるルートをグループ化している
 Route::middleware('auth')->group(function () {
-
-
-
-    
     Route::get('/search', [ContactController::class, 'search']);
     Route::post('/delete', [ContactController::class, 'destroy']);
     Route::post('/export', [ContactController::class, 'export']);
